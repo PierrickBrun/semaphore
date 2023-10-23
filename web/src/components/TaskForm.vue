@@ -123,6 +123,53 @@
         && template.allow_override_branch_in_task"
     />
 
+    <v-row no-gutters class="mt-6">
+      <v-col cols="12" sm="6">
+        <v-checkbox class="mt-0" v-model="item.debug">
+          <template v-slot:label>
+            <div class="text-no-wrap">{{ $t('debug') }} <code>--vvvv</code></div>
+          </template>
+        </v-checkbox>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-checkbox class="mt-0" v-model="item.dry_run">
+          <template v-slot:label>
+            <div class="text-no-wrap">{{ $t('dryRun') }} <code>--check</code></div>
+          </template>
+        </v-checkbox>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-checkbox class="mt-0" v-model="item.diff">
+          <template v-slot:label>
+            <div class="text-no-wrap">{{ $t('diff') }} <code>--diff</code></div>
+          </template>
+        </v-checkbox>
+      </v-col>
+    </v-row>
+
+    <v-text-field
+      v-model="item.limit"
+      :label="$t('Limit')"
+      :disabled="formSaving"
+      :hint="$t('limit_hint')"
+      :rules="[v => !!v || $t('limit_required')]"
+      required
+    />
+
+    <div class="mt-4" v-if="!advancedOptions">
+      <a @click="advancedOptions = true">
+        {{ $t('advanced') }}
+        <v-icon style="transform: translateY(-1px)">mdi-chevron-right</v-icon>
+      </a>
+    </div>
+
+    <div class="mt-4" v-else>
+      <a @click="advancedOptions = false">
+        {{ $t('hide') }}
+        <v-icon style="transform: translateY(-1px)">mdi-chevron-up</v-icon>
+      </a>
+    </div>
+
     <v-autocomplete
       v-model="inventory_id"
       :label="fieldLabel('inventory')"

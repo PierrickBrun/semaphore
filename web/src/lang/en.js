@@ -356,4 +356,7 @@ export default {
   template_tasks: 'Tasks',
   template_details: 'Details',
   template_tf_workspaces: 'Workspaces',
+  Limit: 'Limit',
+  limit_hint: 'Host or group names separated by commas',
+  limit_required: 'Limit is required',
 };

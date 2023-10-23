@@ -345,4 +345,7 @@ export default {
   project_stats: 'Statistiques',
   allow_override_branch: 'Branche',
   template_common_options: 'Options communes',
+  Limit: 'Limite',
+  limit_hint: 'Nom d\'hôte ou de groupe séparé par des virgules',
+  limit_required: 'Limite est requis',
 };
