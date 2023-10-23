@@ -72,6 +72,9 @@ Please follow the [contribution](https://github.com/ansible-semaphore/semaphore/
 All releases after 2.5.1 are signed with the gpg public key
 `8CDE D132 5E96 F1D9 EABF 17D4 2C96 CF7D D27F AB82`
 
+Pierrick: Les releases sont signées avec la clé
+`F054 01BF 5EC9 2B45 AC03 D511 55DC 74D9 F0AF F3B6`
+
 ## Support
 
 If you like Ansible Semaphore, you can support the project development on [Ko-fi](https://ko-fi.com/fiftin).

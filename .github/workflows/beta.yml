@@ -22,14 +22,15 @@ jobs:
 
       - run: task deps
 
-      - run: |
-          echo ${{ secrets.GPG_KEY }} | tr " " "\n" | base64 -d | gpg --import --batch
-          gpg --sign -u "58A7 CC3D 8A9C A2E5 BB5C 141D 4064 23EA F814 63CA" --pinentry-mode loopback --yes --batch --passphrase "${{ secrets.GPG_PASS }}" --output unlock.sig --detach-sign README.md
-          rm -f unlock.sig
+      - run: echo ${{ secrets.GPG_KEY }} | tr " " "\n" | base64 -d | gpg --import --batch
+
+      - run: gpg --sign -u "F054 01BF 5EC9 2B45 AC03 D511 55DC 74D9 F0AF F3B6" --pinentry-mode loopback --yes --batch --passphrase "${{ secrets.GPG_PASS }}" --output unlock.sig --detach-sign README.md
+
+      - run: rm -f unlock.sig
 
       - run:  git reset --hard
 
-      - run: GITHUB_TOKEN=${{ secrets.GH_TOKEN }} task release:prod
+      - run: GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} task release:prod
 
 
   deploy-beta:
@@ -48,11 +49,12 @@ jobs:
 
       - uses: docker/setup-buildx-action@v2
 
-      - name: Login to Docker Hub
+      - name: Login to Github Registry
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASS }}
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v3
@@ -61,7 +63,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           file: ./deployment/docker/prod/buildx.Dockerfile
           push: true
-          tags: semaphoreui/semaphore:beta,semaphoreui/semaphore:${{ github.ref_name }}
+          tags: ghcr.io/pierrickbrun/semaphore:beta,ghcr.io/pierrickbrun/semaphore:${{ github.ref_name }}
 
 
 
@@ -72,4 +74,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           file: ./deployment/docker/prod/runner.buildx.Dockerfile
           push: true
-          tags: semaphoreui/runner:beta,semaphoreui/runner:${{ github.ref_name }}
+          tags: ghcr.io/pierrickbrun/runner:beta,ghcr.io/pierrickbrun/runner:${{ github.ref_name }}
