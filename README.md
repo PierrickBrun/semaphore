@@ -48,4 +48,3 @@ You can test latest version of Semaphore on https://my.semaphore.tech.
 
 Admin and user docs: https://docs.semaphoreui.com.
 
-API description: https://semaphoreui.com/api-docs/.
