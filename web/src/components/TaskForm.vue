@@ -123,6 +123,14 @@
         && template.allow_override_branch_in_task"
     />
 
+    <v-text-field
+      v-model="item.limit"
+      :label="$t('limit')"
+      :disabled="formSaving"
+      :rules="[v => !!v || v.title + ' ' + $t('isRequired')]"
+      required
+    />
+
     <v-autocomplete
       v-model="inventory_id"
       :label="fieldLabel('inventory')"
