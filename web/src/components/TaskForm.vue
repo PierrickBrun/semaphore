@@ -83,6 +83,15 @@
       </v-col>
     </v-row>
 
+    <v-text-field
+      v-model="item.limit"
+      :label="$t('Limit')"
+      :disabled="formSaving"
+      :hint="$t('limit_hint')"
+      :rules="[v => !!v || $t('limit_required')]"
+      required
+    />
+
     <div class="mt-4" v-if="!advancedOptions">
       <a @click="advancedOptions = true">
         {{ $t('advanced') }}

@@ -232,5 +232,7 @@ export default {
   Build: 'Build',
   Deploy: 'Deploy',
   Run: 'Run',
-
+  Limit: 'Limit',
+  limit_hint: 'Host or group names separated by commas',
+  limit_required: 'Limit is required',
 };
