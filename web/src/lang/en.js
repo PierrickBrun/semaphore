@@ -239,4 +239,7 @@ export default {
   CreateDemoProject: 'Create Demo Project',
   LeaveProject: 'Leave Project',
   integration: 'Integration',
+  Limit: 'Limit',
+  limit_hint: 'Host or group names separated by commas',
+  limit_required: 'Limit is required',
 };

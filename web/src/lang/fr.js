@@ -231,4 +231,7 @@ export default {
   Build: 'Construire',
   Deploy: 'Déployer',
   Run: 'Exécuter',
+  Limit: 'Limite',
+  limit_hint: 'Nom d\'hôte ou de groupe séparé par des virgules',
+  limit_required: 'Limite est requis',
 };
