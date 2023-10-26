@@ -239,6 +239,8 @@ export default {
     async afterLoadData() {
       this.assignItem(this.sourceTask);
 
+      this.item.dry_run = true; // --check by default
+
       this.item.template_id = this.templateId;
 
       this.advancedOptions = this.item.arguments != null;
