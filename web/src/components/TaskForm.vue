@@ -123,13 +123,18 @@
         && template.allow_override_branch_in_task"
     />
 
-    <v-text-field
+    <v-autocomplete
       v-model="item.limit"
       :label="$t('limit')"
       :disabled="formSaving"
       :rules="[v => !!v || v.title + ' ' + $t('isRequired')]"
+      :items="groups"
+      item-value="name"
+      item-text="label"
+      outlined
+      dense
       required
-    />
+    ></v-autocomplete>
 
     <v-autocomplete
       v-model="inventory_id"
@@ -213,6 +218,7 @@ export default {
         indentWithTabs: false,
       },
       inventory: null,
+      groups: null,
     };
   },
 
@@ -328,7 +334,9 @@ export default {
     },
 
     isLoaded() {
-      return this.item != null && this.template != null;
+      return this.item != null
+        && this.template != null
+        && this.groups != null;
     },
 
     beforeSave() {
@@ -372,6 +380,13 @@ export default {
           responseType: 'json',
         })).data : [],
       ]);
+
+      this.groups = (await axios({
+        keys: 'get',
+        url: process.env.VUE_APP_ANSIBLE_GROUPS_API_URL,
+        responseType: 'json',
+      })).data;
+      this.groups.push({ name: 'all', label: 'All' });
 
       if (this.item.build_task_id == null
         && this.buildTasks.length > 0
