@@ -83,14 +83,18 @@
       </v-col>
     </v-row>
 
-    <v-text-field
+    <v-autocomplete
       v-model="item.limit"
       :label="$t('Limit')"
-      :disabled="formSaving"
-      :hint="$t('limit_hint')"
+      :items="groups"
+      item-value="name"
+      item-text="label"
       :rules="[v => !!v || $t('limit_required')]"
+      outlined
+      dense
       required
-    />
+      :disabled="formSaving"
+    ></v-autocomplete>
 
     <div class="mt-4" v-if="!advancedOptions">
       <a @click="advancedOptions = true">
@@ -173,6 +177,7 @@ export default {
         indentWithTabs: false,
       },
       advancedOptions: false,
+      groups: null,
     };
   },
   watch: {
@@ -229,7 +234,8 @@ export default {
     isLoaded() {
       return this.item != null
         && this.template != null
-        && this.buildTasks != null;
+        && this.buildTasks != null
+        && this.groups != null;
     },
 
     beforeSave() {
@@ -262,6 +268,14 @@ export default {
         && this.buildTasks.length > 0) {
         this.item.build_task_id = this.buildTasks[0].id;
       }
+
+      this.groups = (await axios({
+        keys: 'get',
+        url: process.env.VUE_APP_ANSIBLE_GROUPS_API_URL,
+        responseType: 'json',
+        withCredentials: true,
+      })).data;
+      this.groups.push({ name: 'all', label: 'All' });
     },
 
     getItemsUrl() {
