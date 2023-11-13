@@ -273,7 +273,6 @@ export default {
         keys: 'get',
         url: process.env.VUE_APP_ANSIBLE_GROUPS_API_URL,
         responseType: 'json',
-        withCredentials: true,
       })).data;
       this.groups.push({ name: 'all', label: 'All' });
     },
