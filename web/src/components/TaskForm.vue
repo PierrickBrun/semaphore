@@ -78,6 +78,22 @@
         dense
       />
 
+      <v-autocomplete
+        v-else-if="['hippolocal_version', 'hippolocalweb_version'].includes(v.name)"
+        v-model="editedEnvironment[v.name]"
+        :key="v.name"
+        :label="v.title"
+        :items="v.options"
+        :hint="v.description"
+        :rules="[
+            val => !v.required || !!val || v.title + ' ' + $t('isRequired'),
+          ]"
+        outlined
+        dense
+        :required="v.required"
+        :disabled="formSaving"
+      ></v-autocomplete>
+
       <v-select
         clearable
         v-else-if="v.type === 'enum'"
@@ -219,12 +235,25 @@ export default {
       },
       inventory: null,
       groups: null,
+      hippolocal_versions: null,
+      hippolocalweb_versions: null,
     };
   },
 
   computed: {
     needInventory() {
       return this.needField('inventory') && this.template.task_params?.allow_override_inventory;
+    },
+
+    survey_vars() {
+      const vars = this.template.survey_vars || [];
+      return vars.filter((v) => !(['hippolocal_version', 'hippolocalweb_version'].includes(v.name)));
+    },
+    survey_vars_options() {
+      let vars = this.template.survey_vars || [];
+      vars = vars.filter((v) => ['hippolocal_version', 'hippolocalweb_version'].includes(v.name));
+      console.log(this.hippolocal_versions);
+      return vars.map((obj) => ({ ...obj, options: (obj.name === 'hippolocal_version') ? this.hippolocal_versions : this.hippolocalweb_versions }));
     },
 
     args() {
@@ -387,6 +416,20 @@ export default {
         responseType: 'json',
       })).data;
       this.groups.push({ name: 'all', label: 'All' });
+
+      if (this.survey_vars_options.length > 0) {
+        this.hippolocal_versions = (await axios({
+          keys: 'get',
+          url: process.env.VUE_APP_HIPPO_VERSIONS_URL,
+          responseType: 'json',
+        })).data.map((release) => release.name);
+
+        this.hippolocalweb_versions = (await axios({
+          keys: 'get',
+          url: process.env.VUE_APP_HIPPO_WEB_VERSIONS_URL,
+          responseType: 'json',
+        })).data.map((release) => release.name);
+      }
 
       if (this.item.build_task_id == null
         && this.buildTasks.length > 0
