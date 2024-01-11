@@ -46,18 +46,36 @@
     />
 
     <v-text-field
-      v-for="(v) in template.survey_vars || []"
+      v-for="(v) in survey_vars"
       :key="v.name"
       :label="v.title"
       :hint="v.description"
       v-model="editedEnvironment[v.name]"
       :required="v.required"
       :rules="[
-          val => !v.required || !!val || v.title + $t('isRequired'),
+          val => !v.required || !!val || v.title + ' ' + $t('isRequired'),
           val => !val || v.type !== 'int' || /^\d+$/.test(val) ||
           v.title + ' ' + $t('mustBeInteger'),
         ]"
     />
+
+    <v-autocomplete
+      v-for="(v) in survey_vars_options"
+      v-model="editedEnvironment[v.name]"
+      :key="v.name"
+      :label="v.title"
+      :items="v.options"
+      :hint="v.description"
+      :rules="[
+          val => !v.required || !!val || v.title + ' ' + $t('isRequired'),
+          val => !val || v.type !== 'int' || /^\d+$/.test(val) ||
+          v.title + ' ' + $t('mustBeInteger'),
+        ]"
+      outlined
+      dense
+      :required="v.required"
+      :disabled="formSaving"
+    ></v-autocomplete>
 
     <v-row no-gutters class="mt-6">
       <v-col cols="12" sm="6">
@@ -178,6 +196,8 @@ export default {
       },
       advancedOptions: false,
       groups: null,
+      hippolocal_versions: null,
+      hippolocalweb_versions: null,
     };
   },
   watch: {
@@ -199,6 +219,18 @@ export default {
       if (val == null) {
         this.commit_hash = null;
       }
+    },
+  },
+  computed: {
+    survey_vars() {
+      const vars = this.template.survey_vars || [];
+      return vars.filter((v) => !(['hippolocal_version', 'hippolocalweb_version'].includes(v.name)));
+    },
+    survey_vars_options() {
+      let vars = this.template.survey_vars || [];
+      vars = vars.filter((v) => ['hippolocal_version', 'hippolocalweb_version'].includes(v.name));
+      console.log(this.hippolocal_versions);
+      return vars.map((obj) => ({ ...obj, options: (obj.name === 'hippolocal_version') ? this.hippolocal_versions : this.hippolocalweb_versions }));
     },
   },
   methods: {
@@ -275,6 +307,20 @@ export default {
         responseType: 'json',
       })).data;
       this.groups.push({ name: 'all', label: 'All' });
+
+      if (this.survey_vars_options.length > 0) {
+        this.hippolocal_versions = (await axios({
+          keys: 'get',
+          url: process.env.VUE_APP_HIPPO_VERSIONS_URL,
+          responseType: 'json',
+        })).data.map((release) => release.name);
+
+        this.hippolocalweb_versions = (await axios({
+          keys: 'get',
+          url: process.env.VUE_APP_HIPPO_WEB_VERSIONS_URL,
+          responseType: 'json',
+        })).data.map((release) => release.name);
+      }
     },
 
     getItemsUrl() {
