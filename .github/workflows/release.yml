@@ -58,7 +58,7 @@ jobs:
 
   deploy-prod:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'semaphoreui'
+    if: github.repository_owner == 'PierrickBrun'
 
     steps:
       - name: Checkout source
@@ -76,21 +76,20 @@ jobs:
         uses: docker/login-action@v3
         if: github.event_name != 'pull_request'
         with:
-          username: ${{ secrets.DOCKER_USER }}
-          password: ${{ secrets.DOCKER_PASS }}
-
-
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GH_TOKEN }}
 
       - name: Server meta
         id: server
         uses: docker/metadata-action@v5
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_TOKEN }}
           images: |
-            semaphoreui/semaphore
+            PierrickBrun/semaphore
           labels: |
-            org.opencontainers.image.vendor=SemaphoreUI
-            maintainer=Semaphore UI <support@semaphoreui.com>
+            org.opencontainers.image.vendor=PierrickBrun
+            maintainer=Pierrick Brun <p.brun@onsen-sas.com>
           tags: |
             type=raw,value=${{ github.ref_name }}
           flavor: |
@@ -118,7 +117,7 @@ jobs:
           platforms: linux/amd64,linux/arm64 # ,linux/arm/v6
           push: ${{ github.event_name != 'pull_request' }}
           labels: ${{ steps.server.outputs.labels }}
-          tags: semaphoreui/semaphore:${{ github.ref_name }}-ansible2.16.5
+          tags: PierrickBrun/semaphore:${{ github.ref_name }}-ansible2.16.5
 
       - name: Server build with PowerShell 7.5.0
         uses: docker/build-push-action@v5
@@ -127,13 +126,13 @@ jobs:
           context: .
           build-args: |
             POWERSHELL_VERSION=7.5.0
-            SEMAPHORE_IMAGE=semaphoreui/semaphore
+            SEMAPHORE_IMAGE=PierrickBrun/semaphore
             SEMAPHORE_VERSION=${{ github.ref_name }}
           file: deployment/docker/server/powershell/Dockerfile
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           labels: ${{ steps.server.outputs.labels }}
-          tags: semaphoreui/semaphore:${{ github.ref_name }}-powershell7.5.0
+          tags: PierrickBrun/semaphore:${{ github.ref_name }}-powershell7.5.0
 
 
 
@@ -141,12 +140,12 @@ jobs:
         id: runner
         uses: docker/metadata-action@v5
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_TOKEN }}
           images: |
-            semaphoreui/runner
+            PierrickBrun/runner
           labels: |
-            org.opencontainers.image.vendor=SemaphoreUI
-            maintainer=Semaphore UI <support@semaphoreui.com>
+            org.opencontainers.image.vendor=PierrickBrun
+            maintainer=Pierrick Brun <p.brun@onsen-sas.com>
           tags: |
             type=raw,value=${{ github.ref_name }}
           flavor: |
@@ -174,7 +173,7 @@ jobs:
           platforms: linux/amd64,linux/arm64 #,linux/arm/v6
           push: ${{ github.event_name != 'pull_request' }}
           labels: ${{ steps.runner.outputs.labels }}
-          tags: semaphoreui/runner:${{ github.ref_name }}-ansible2.16.5
+          tags: PierrickBrun/runner:${{ github.ref_name }}-ansible2.16.5
 
       - name: Runner build with PowerShell 7.5.0
         uses: docker/build-push-action@v5
@@ -183,10 +182,10 @@ jobs:
           context: .
           build-args: |
             POWERSHELL_VERSION=7.5.0
-            SEMAPHORE_IMAGE=semaphoreui/runner
+            SEMAPHORE_IMAGE=PierrickBrun/runner
             SEMAPHORE_VERSION=${{ github.ref_name }}
           file: deployment/docker/server/powershell/Dockerfile
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           labels: ${{ steps.runner.outputs.labels }}
-          tags: semaphoreui/runner:${{ github.ref_name }}-powershell7.5.0
+          tags: PierrickBrun/runner:${{ github.ref_name }}-powershell7.5.0
