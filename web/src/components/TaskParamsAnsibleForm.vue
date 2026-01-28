@@ -5,9 +5,10 @@
       v-if="templateParams.allow_override_limit"
       :vars="params.limit"
       @change="setLimit"
-      :title="$t('limit')"
-      :arg-title="$t('limit')"
+      :title="$t('limit') + ' *'"
+      :arg-title="$t('limit') + ' *'"
       :add-arg-title="$t('addLimit')"
+      :items="groups"
     />
 
     <ArgsPicker
@@ -88,6 +89,7 @@
 <script>
 
 import ArgsPicker from '@/components/ArgsPicker.vue';
+import axios from 'axios';
 
 const APP_PARAMS = {
   ansible: [
@@ -120,6 +122,7 @@ export default {
       params: {
         debug_level: 4,
       },
+      groups: null,
     };
   },
 
@@ -128,6 +131,12 @@ export default {
       ...this.value,
       debug_level: this.value.debug_level || 4,
     };
+    axios({
+      keys: 'get',
+      url: process.env.VUE_APP_ANSIBLE_GROUPS_API_URL,
+      responseType: 'json',
+    }).then((res) => { this.groups = res.data; });
+    this.groups.push({ name: 'all', label: 'All' });
   },
 
   methods: {

@@ -82,9 +82,9 @@
         v-else-if="['hippolocal_version', 'hippolocalweb_version'].includes(v.name)"
         v-model="editedEnvironment[v.name]"
         :key="v.name"
-        :label="v.title"
-        :items="v.options"
-        :hint="v.description"
+        :label="v.title + (v.required ? ' *' : '')"
+        :items="(v.name === 'hippolocal_version') ?
+          hippolocal_versions : hippolocalweb_versions"
         :rules="[
             val => !v.required || !!val || v.title + ' ' + $t('isRequired'),
           ]"
@@ -138,19 +138,6 @@
         needField('allow_override_branch')
         && template.allow_override_branch_in_task"
     />
-
-    <v-autocomplete
-      v-model="item.limit"
-      :label="$t('limit')"
-      :disabled="formSaving"
-      :rules="[v => !!v || v.title + ' ' + $t('isRequired')]"
-      :items="groups"
-      item-value="name"
-      item-text="label"
-      outlined
-      dense
-      required
-    ></v-autocomplete>
 
     <v-autocomplete
       v-model="inventory_id"
@@ -234,7 +221,6 @@ export default {
         indentWithTabs: false,
       },
       inventory: null,
-      groups: null,
       hippolocal_versions: null,
       hippolocalweb_versions: null,
     };
@@ -248,12 +234,6 @@ export default {
     survey_vars() {
       const vars = this.template.survey_vars || [];
       return vars.filter((v) => !(['hippolocal_version', 'hippolocalweb_version'].includes(v.name)));
-    },
-    survey_vars_options() {
-      let vars = this.template.survey_vars || [];
-      vars = vars.filter((v) => ['hippolocal_version', 'hippolocalweb_version'].includes(v.name));
-      console.log(this.hippolocal_versions);
-      return vars.map((obj) => ({ ...obj, options: (obj.name === 'hippolocal_version') ? this.hippolocal_versions : this.hippolocalweb_versions }));
     },
 
     args() {
@@ -364,13 +344,16 @@ export default {
 
     isLoaded() {
       return this.item != null
-        && this.template != null
-        && this.groups != null;
+        && this.template != null;
     },
 
     beforeSave() {
       this.item.environment = JSON.stringify(this.editedEnvironment);
       this.item.secret = JSON.stringify(this.editedSecretEnvironment);
+
+      if ((this.item.params.limit || []).length === 0) {
+        throw new Error('Pas de limite 😱');
+      }
     },
 
     refreshItem() {
@@ -410,26 +393,17 @@ export default {
         })).data : [],
       ]);
 
-      this.groups = (await axios({
+      this.hippolocal_versions = (await axios({
         keys: 'get',
-        url: process.env.VUE_APP_ANSIBLE_GROUPS_API_URL,
+        url: process.env.VUE_APP_HIPPO_VERSIONS_URL,
         responseType: 'json',
-      })).data;
-      this.groups.push({ name: 'all', label: 'All' });
+      })).data.map((release) => release.name);
 
-      if (this.survey_vars_options.length > 0) {
-        this.hippolocal_versions = (await axios({
-          keys: 'get',
-          url: process.env.VUE_APP_HIPPO_VERSIONS_URL,
-          responseType: 'json',
-        })).data.map((release) => release.name);
-
-        this.hippolocalweb_versions = (await axios({
-          keys: 'get',
-          url: process.env.VUE_APP_HIPPO_WEB_VERSIONS_URL,
-          responseType: 'json',
-        })).data.map((release) => release.name);
-      }
+      this.hippolocalweb_versions = (await axios({
+        keys: 'get',
+        url: process.env.VUE_APP_HIPPO_WEB_VERSIONS_URL,
+        responseType: 'json',
+      })).data.map((release) => release.name);
 
       if (this.item.build_task_id == null
         && this.buildTasks.length > 0

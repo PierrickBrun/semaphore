@@ -19,7 +19,21 @@
             >{{ formError }}
             </v-alert>
 
+            <v-autocomplete
+              v-if="(items || []).length > 0"
+              :items="items"
+              item-value="name"
+              item-text="label"
+              :label="argTitle || $t('arg')"
+              v-model.trim="editedVar.name"
+              :rules="[(v) => !!v || $t('arg_required')]"
+              required
+              outlined
+              dense
+              />
+
             <v-text-field
+              v-else
               :label="argTitle || $t('arg')"
               v-model.trim="editedVar.name"
               :rules="[(v) => !!v || $t('arg_required')]"
@@ -101,6 +115,7 @@ export default {
     title: String,
     addArgTitle: String,
     argTitle: String,
+    items: Array,
   },
   watch: {
     vars(val) {
