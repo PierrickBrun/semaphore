@@ -3,8 +3,8 @@ name: Community Release
 'on':
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-      - v*-rc*
+      - 'v[0-9]+.[0-9]+.[0-9]+-onsen'
+      - v*-onsen-rc*
 
 jobs:
   release:
